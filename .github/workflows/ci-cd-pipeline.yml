@@ -1,0 +1,61 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - master  # Or 'main', depending on your default branch
+  pull_request:
+    branches:
+      - master  # Or 'main'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout repository
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      # Step 2: Set up Node.js
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+
+      # Step 3: Install frontend dependencies
+      - name: Install frontend dependencies
+        working-directory: ./frontend
+        run: |
+          npm install
+
+      # Step 4: Build frontend
+      - name: Build frontend
+        working-directory: ./frontend
+        run: |
+          npm run build
+
+      # Step 5: Install backend dependencies
+      - name: Install backend dependencies
+        working-directory: ./backend
+        run: |
+          npm install
+
+      # Step 6: Run frontend tests (if applicable)
+      - name: Run tests for frontend
+        working-directory: ./frontend
+        run: |
+          npm test -- --coverage
+
+      # Step 7: Run backend tests (if applicable)
+      - name: Run tests for backend
+        working-directory: ./backend
+        run: |
+          npm test -- --coverage
+
+      # Step 8: Build Docker image (Optional: If you have a Docker setup)
+      - name: Build and push Docker image
+        run: |
+          docker build -t yourusername/delivery-app .
+          docker push yourusername/delivery-app:latest
+
